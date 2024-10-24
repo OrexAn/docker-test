@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  web-1:
+    image: nginx
+    ports:
+      - "9081:80"
+  web-2:
+    image: nginx
+    ports:
+      - "9082:80"
+  web-3:
+    image: nginx
+    ports:
+      - "9083:80"
+  web-4:
+    image: nginx
+    ports:
+      - "9084:80"
+  web-5:
+    image: nginx
+    ports:
+      - "9085:80"
+
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - ./src/main/resources/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+      ME_CONFIG_BASICAUTH: false
+    depends_on:
+      - "mongo"
+
+  my-app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      MONGODB_USERNAME: root
+      MONGODB_PASSWORD: example
+    depends_on:
+      - "mongo"
+
+
